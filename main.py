@@ -16,12 +16,12 @@ class Operator(Enum):
 
 def coerce_input_value(val: int) -> float:
     if val < 0 or val > MAX_INPUT:
-        raise ValueError("Input must be between 0 and 10")
+        raise ValueError(f"Input must be between 0 and {MAX_INPUT}")
     return val / float(MAX_INPUT)
 
 def coerce_output_value(val: int) -> float:
     if val < -MAX_INPUT or val > 2 * MAX_INPUT:
-        raise ValueError(f"Input must be between {-MAX_INPUT} and {2 * MAX_INPUT}")
+        raise ValueError(f"Output value must be between {-MAX_INPUT} and {2 * MAX_INPUT}")
     return (val + MAX_INPUT) / float(3 * MAX_INPUT)
 
 def uncoerce_input_value(val: float) -> int:
