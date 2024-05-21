@@ -15,11 +15,6 @@ class Operator(Enum):
     minus = 0
 
 def coerce_input_value(val: int) -> float:
-    """
-    coerce an input number to be fed into the model into the range [0..1]
-    val: a value in range [0, 10]
-    returns: a value in range [0,1], where 0 corresponds to 0, 0.1 to, ... and 1 to 10
-    """
     if val < 0 or val > MAX_INPUT:
         raise ValueError("Input must be between 0 and 10")
     return val / float(MAX_INPUT)
