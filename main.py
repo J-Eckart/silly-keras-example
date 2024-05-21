@@ -9,6 +9,8 @@ from typing import List
 import re
 
 MAX_INPUT = 100
+NUM_NEURONS_PER_LAYER = 10
+NUM_LAYERS = 2
 
 class Operator(Enum):
     plus = 1
@@ -52,11 +54,13 @@ def input_array_from_expression(expression: str) -> List[float]:
         raise ValueError("Invalid operation")
 
 def create_model() -> keras.Sequential:
-    model = keras.Sequential([
+    layers = [
         keras.layers.Input(shape=(3,)),
-        keras.layers.Dense(10, activation="relu"),
-        keras.layers.Dense(1, activation="relu")
-    ])
+    ]
+    for i in range(0, NUM_LAYERS):
+        layers.append(keras.layers.Dense(NUM_NEURONS_PER_LAYER, activation="relu"))
+    layers.append(keras.layers.Dense(1, activation="relu"))
+    model = keras.Sequential(layers)
     return model
 
 def generate_training_input(size: int):
@@ -89,7 +93,7 @@ def main():
     training_size = int(input("Please choose number of operations to train on: "))
     x_train = generate_training_input(training_size)
     y_train = generate_training_output(x_train)
-    x_test = generate_training_input(10)
+    x_test = generate_training_input(100)
     y_test = generate_training_output(x_test)
     print(f"Training on {training_size} operations....")
     model.fit(x_train, y_train, verbose=0)
