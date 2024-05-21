@@ -8,6 +8,8 @@ import random
 from typing import List
 import re
 
+MAX_INPUT = 100
+
 class Operator(Enum):
     plus = 1
     minus = 0
@@ -18,20 +20,20 @@ def coerce_input_value(val: int) -> float:
     val: a value in range [0, 10]
     returns: a value in range [0,1], where 0 corresponds to 0, 0.1 to, ... and 1 to 10
     """
-    if val < 0 or val > 10:
+    if val < 0 or val > MAX_INPUT:
         raise ValueError("Input must be between 0 and 10")
-    return val / 10.0
+    return val / float(MAX_INPUT)
 
 def coerce_output_value(val: int) -> float:
-    if val < -10 or val > 20:
-        raise ValueError("Input must be between -10 and 30")
-    return (val + 10) / 30.0
+    if val < -MAX_INPUT or val > 2 * MAX_INPUT:
+        raise ValueError(f"Input must be between {-MAX_INPUT} and {2 * MAX_INPUT}")
+    return (val + MAX_INPUT) / float(3 * MAX_INPUT)
 
 def uncoerce_input_value(val: float) -> int:
-    return round(val*10.0)
+    return round(val*float(MAX_INPUT))
 
 def uncoerce_output_value(val: float) -> int:
-    return round(val * 30.0 - 10.0)
+    return round(val * 3 * MAX_INPUT - MAX_INPUT)
 
 def coerce_operator(operator: Operator) -> float:
     return float(operator.value)
@@ -43,7 +45,7 @@ def generate_input_array(first_operand: int, second_operand: int, operator: Oper
     return [coerce_input_value(first_operand), coerce_input_value(second_operand), coerce_operator(operator)]
 
 def input_array_from_expression(expression: str) -> List[float]:
-    regex_str = r"(\d)\s*([+-])\s*(\d)"
+    regex_str = r"(\d+)\s*([+-])\s*(\d+)"
     regex = re.compile(regex_str)
     try:
         m = regex.match(expression)
@@ -68,7 +70,7 @@ def generate_training_input(size: int):
         op = Operator.plus
         if random.randint(0, 1) > 0:
             op = Operator.minus
-        to_return.append(generate_input_array(random.randint(0, 10), random.randint(0, 10), op))
+        to_return.append(generate_input_array(random.randint(0, MAX_INPUT), random.randint(0, MAX_INPUT), op))
     return to_return
 
 def generate_training_output(training_input: List):
@@ -98,10 +100,10 @@ def main():
     model.fit(x_train, y_train, verbose=0)
     print("Evaluating....")
     eval_res = model.evaluate(x_test, y_test, verbose=0)
-    print(f"Remaining raw error is {eval_res}, which correlates to an error in the actual result of approx. {eval_res * 30.0}")
+    print(f"Remaining raw error is {eval_res}, which correlates to an error in the actual result of approx. {eval_res * 3 * MAX_INPUT}")
     while True:
         try:
-            expression = input("Please enter an operation in the format 'a + b' or 'a - b', where a and b are numbers between 0 and 10: ")
+            expression = input(f"Please enter an operation in the format 'a + b' or 'a - b', where a and b are numbers between 0 and {MAX_INPUT}: ")
             res = model.predict([input_array_from_expression(expression)])
             print(f"Result of {expression} is (maybe):", uncoerce_output_value(res[0][0]))
         except ValueError:
