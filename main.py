@@ -45,14 +45,14 @@ def generate_input_array(first_operand: int, second_operand: int, operator: Oper
 def input_array_from_expression(expression: str) -> List[float]:
     regex_str = r"(\d)\s*([+-])\s*(\d)"
     regex = re.compile(regex_str)
- #   try:
-    m = regex.match(expression)
-    if m.groups()[1] == "+":
-        return generate_input_array(int(m.groups()[0]), int(m.groups()[2]), Operator.plus)
-    else:
-        return generate_input_array(int(m.groups()[0]), int(m.groups()[2]), Operator.minus)
-#    except:
-#        raise ValueError("Invalid operation")
+    try:
+        m = regex.match(expression)
+        if m.groups()[1] == "+":
+            return generate_input_array(int(m.groups()[0]), int(m.groups()[2]), Operator.plus)
+        else:
+            return generate_input_array(int(m.groups()[0]), int(m.groups()[2]), Operator.minus)
+    except:
+        raise ValueError("Invalid operation")
 
 def create_model() -> keras.Sequential:
     model = keras.Sequential([
@@ -100,28 +100,13 @@ def main():
     eval_res = model.evaluate(x_test, y_test, verbose=0)
     print(f"Remaining raw error is {eval_res}, which correlates to an error in the actual result of approx. {eval_res * 30.0}")
     while True:
-        """
-        op_input = input("Please choose operator. + for plus, - for minus, anything else to exit: ")
-        op = None
-        if op_input == "+":
-            op = Operator.plus
-        elif op_input == "-":
-            op = Operator.minus
-        else:
-            print("Bye!")
-            exit(0)
         try:
-            arg1 = int(input("Enter first number in range [0, 10]: "))
-            arg2 = int(input("Second number: "))
-            res = model.predict([generate_input_array(arg1, arg2, op)])
+            expression = input("Please enter an operation in the format 'a + b' or 'a - b', where a and b are numbers between 0 and 10: ")
+            res = model.predict([input_array_from_expression(expression)])
+            print(f"Result of {expression} is (maybe):", uncoerce_output_value(res[0][0]))
         except ValueError:
-            print("Please make sure to input integers between 0 and 10!")
-            continue
-        """
-        expression = input("Please enter an operation in the format 'a + b' or 'a - b', where a and b are numbers between 0 and 10: ")
-        res = model.predict([input_array_from_expression(expression)])
+            print("That doesn't look like elementary school level maths to me...")
 
-        print(f"Result of {expression} is (maybe):", uncoerce_output_value(res[0][0]))
 
 if __name__ == "__main__":
     main()
